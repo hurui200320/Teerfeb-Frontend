@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MenuItem} from "primeng/api";
 
 @Component({
@@ -14,7 +14,8 @@ export class NaviComponent implements OnInit {
     {icon: 'pi pi-pencil', label: '数据可视化', routerLink: '/view'}
   ];
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

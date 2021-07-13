@@ -5,6 +5,7 @@ import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-xray',
+  providers: [MessageService],
   templateUrl: './xray.component.html',
   styleUrls: ['./xray.component.css']
 })
@@ -31,7 +32,6 @@ export class XrayComponent implements OnInit {
       this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(
         `data:image/png;base64, ${this.result!!.image}`
       );
-      console.log(this.result)
     }
   }
 

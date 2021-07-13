@@ -30,7 +30,7 @@ import {HttpClientModule} from "@angular/common/http";
     MenubarModule,
     RippleModule,
     FileUploadModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
