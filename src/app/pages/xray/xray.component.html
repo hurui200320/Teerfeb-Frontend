@@ -1,0 +1,17 @@
+<div class="card" *ngIf="result == null">
+  <h5>Upload your Xray/CT image</h5>
+  <p-fileUpload mode="basic" name="pic"
+                [url]="apiUrl" accept="image/*"
+                [maxFileSize]="1000000" (onUpload)="onUpload($event)"
+                [auto]="true" chooseLabel="Browse"
+  ></p-fileUpload>
+
+</div>
+
+<div class="card" *ngIf="result != null">
+  <img [src]="imageUrl" alt="Uploaded picture"/>
+  <h5>Your result is</h5>
+  <p>Covid: {{(result.covid * 100).toFixed(2)}}%</p>
+  <p>Viral: {{(result.viral * 100).toFixed(2)}}%</p>
+  <p>Normal: {{(result.normal * 100).toFixed(2)}}%</p>
+</div>
