@@ -9,9 +9,9 @@ import {MenuItem} from "primeng/api";
 export class NaviComponent implements OnInit {
   menuItems: MenuItem[] = [
     {icon: 'pi pi-home', label: '主页', routerLink: '/'},
-    {icon: 'pi pi-desktop', label: 'Xray/CT', routerLink: '/xray'},
-    {icon: 'pi pi-exclamation-triangle', label: '并发症预警', routerLink: '/alert'},
-    {icon: 'pi pi-pencil', label: '数据可视化', routerLink: '/view'}
+    {icon: 'pi pi-desktop', label: 'Xray/CT预测新冠', routerLink: '/xray'},
+    {icon: 'pi pi-search', label: '生理指标预测糖尿病', routerLink: '/diabetes'},
+    {icon: 'pi pi-pencil', label: '新冠疫情数据可视化', routerLink: '/view'}
   ];
 
   constructor() {

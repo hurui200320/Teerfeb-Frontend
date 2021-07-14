@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+.card {
+  margin: auto;
+  width: fit-content;
+}
+.article {
+  width: fit-content;
+  max-width: 50rem;
+  margin: auto;
+}
+.paragraph {
+  font-weight: lighter;
+  font-size: 20px;
+  line-height: 2.3rem;
+  margin-bottom: 1.7rem;
+}

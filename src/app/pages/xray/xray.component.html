@@ -1,17 +1,54 @@
-<div class="card" *ngIf="result == null">
-  <h5>Upload your Xray/CT image</h5>
-  <p-fileUpload mode="basic" name="pic"
-                [url]="apiUrl" accept="image/*"
-                [maxFileSize]="1000000" (onUpload)="onUpload($event)"
-                [auto]="true" chooseLabel="Browse"
-  ></p-fileUpload>
+<p-tabView>
+  <p-tabPanel header="介绍">
+    <div class="article" style="width: 40rem">
+      <h1>通过Xray/CT图像预测新冠肺炎</h1>
+      <div class="paragraph">
+        该模块可以通过卷积神经网络对胸腔X光/CT图像进行识别，并给出“Covid-19”、“健康”、“病毒性肺炎”三种分类的概率。
+      </div>
+      <div class="paragraph">
+        该模型使用经典的LeNet模型，输入为单通道192x192像素。使用<a href="https://www.kaggle.com/tawsifurrahman/covid19-radiography-database">COVID-19
+        Radiography Database</a>数据集进行训练，训练代码和网络结构请参见<a
+        href="https://github.com/hurui200320/Teerfeb-Backend/blob/master/src/main/kotlin/info/skyblond/teerfeb/model/train/CovidXrayCNN.kt">GitHub
+        Repo</a>。
+      </div>
+    </div>
+  </p-tabPanel>
+  <p-tabPanel header="预测">
+    <div class="card" *ngIf="result == null">
 
-</div>
+      <div class="card">
+        <h2>在此上传一张X光/CT影像：</h2>
+      </div>
+      <div class="card">
+        <p-fileUpload mode="basic" name="pic"
+                      [url]="apiUrl" accept="image/*"
+                      [maxFileSize]="1000000" (onUpload)="onUpload($event)"
+                      [auto]="true" chooseLabel="选择"
+        ></p-fileUpload>
+      </div>
+      <div class="article" style="width: 20rem">
+        <div class="paragraph">选择图片后将自动上传，模型较大，请耐心等待，如2分钟内没有结果，请刷新页面重试。</div>
+      </div>
+    </div>
+    <div class="card" *ngIf="result != null">
+      <div class="card">
+        <img [src]="imageUrl" alt="Uploaded picture"/>
+      </div>
+      <div class="card">
+        <h3>模型预测结果：</h3>
+        <p>Covid-19: {{(result.covid * 100).toFixed(2)}}%</p>
+        <p>病毒性肺炎: {{(result.viral * 100).toFixed(2)}}%</p>
+        <p>健康: {{(result.normal * 100).toFixed(2)}}%</p>
+      </div>
 
-<div class="card" *ngIf="result != null">
-  <img [src]="imageUrl" alt="Uploaded picture"/>
-  <h5>Your result is</h5>
-  <p>Covid: {{(result.covid * 100).toFixed(2)}}%</p>
-  <p>Viral: {{(result.viral * 100).toFixed(2)}}%</p>
-  <p>Normal: {{(result.normal * 100).toFixed(2)}}%</p>
+      <div class="card">
+        <button (click)="result = null" pButton type="button" label="返回"></button>
+      </div>
+    </div>
+  </p-tabPanel>
+</p-tabView>
+<div class="article">
+  <div class="paragraph" style="color: red; font-weight: bold">
+    免责声明：本模型不具备任何医学权威与参考价值，模型预测结果仅供展示，病理结果请以主治医师结论为准。代码和模型作者对于任何基于本模型预测结果所作判断而产生的后果概不负责。
+  </div>
 </div>

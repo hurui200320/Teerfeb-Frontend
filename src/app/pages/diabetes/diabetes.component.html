@@ -1,0 +1,50 @@
+<p-tabView>
+  <p-tabPanel header="介绍">
+    <div class="article" style="width: 40rem">
+      <h1>通过生理指标预测糖尿病患病概率</h1>
+      <div class="paragraph">
+        该模块可以通过多层感知机网络对用户提交的多项生理数据进行分类任务，并给出该组数据下患有糖尿病的概率。模型输入以原始数据集为准，故保留英文名称以防中文翻译出现偏差。
+      </div>
+      <div class="paragraph">
+        该模型使用具有一层隐藏层的多层感知机模型模型，输入为8个生理指标，输出一个概率。使用<a href="https://www.kaggle.com/uciml/pima-indians-diabetes-database">Pima
+        Indians Diabetes Database</a>数据集进行训练，训练代码和网络结构请参见<a
+        href="https://github.com/hurui200320/Teerfeb-Backend/blob/master/src/main/kotlin/info/skyblond/teerfeb/model/train/DiabetesMLP.kt">GitHub
+        Repo</a>。
+      </div>
+    </div>
+  </p-tabPanel>
+  <p-tabPanel header="预测">
+    <div class="card" *ngIf="result == null">
+      <div class="p-field" *ngFor="let input of inputs">
+        <label [for]="input.id">{{input.name}}</label>
+        <input [id]="input.id" type="number"
+               pInputText [min]="input.min" [step]="input.step"
+               [(ngModel)]="input.value"
+        />
+        <small *ngIf="input.description != ''">{{input.description}}</small>
+      </div>
+      <div class="card">
+        <button (click)="onSubmit()" pButton type="button" label="提交"></button>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="result != null">
+      <div class="card">
+        <h3>您患糖尿病的概率是{{(result * 100).toFixed(3)}}%</h3>
+      </div>
+      <div class="card">
+        <p *ngIf="result < 0.5">您似乎不太可能患有糖尿病。</p>
+        <p *ngIf="result >= 0.5 && result < 0.8">您有可能患有糖尿病。</p>
+        <p *ngIf="result >= 0.8">您极有可能患有糖尿病。</p>
+      </div>
+      <div class="card">
+        <button (click)="result = null" pButton type="button" label="返回"></button>
+      </div>
+    </div>
+  </p-tabPanel>
+</p-tabView>
+<div class="article">
+  <div class="paragraph" style="color: red; font-weight: bold">
+    免责声明：本模型不具备任何医学权威与参考价值，模型预测结果仅供展示，如有不适请及时前往医院就诊。病理结果请以主治医师结论为准。代码和模型作者对于任何基于本模型预测结果所作判断而产生的后果概不负责。
+  </div>
+</div>

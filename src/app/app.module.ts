@@ -9,10 +9,14 @@ import {MenubarModule} from "primeng/menubar";
 import {RippleModule} from "primeng/ripple";
 import {HomeComponent} from './pages/home/home.component';
 import {XrayComponent} from './pages/xray/xray.component';
-import {AlertComponent} from './pages/alert/alert.component';
 import {ViewComponent} from './pages/view/view.component';
 import {FileUploadModule} from "primeng/fileupload";
 import {HttpClientModule} from "@angular/common/http";
+import { DiabetesComponent } from './pages/diabetes/diabetes.component';
+import {InputTextModule} from "primeng/inputtext";
+import {FormsModule} from "@angular/forms";
+import {TabViewModule} from "primeng/tabview";
+import {ListboxModule} from "primeng/listbox";
 
 @NgModule({
   declarations: [
@@ -21,17 +25,21 @@ import {HttpClientModule} from "@angular/common/http";
     FooterComponent,
     HomeComponent,
     XrayComponent,
-    AlertComponent,
-    ViewComponent
+    ViewComponent,
+    DiabetesComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    MenubarModule,
-    RippleModule,
-    FileUploadModule,
-    HttpClientModule,
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        MenubarModule,
+        RippleModule,
+        FileUploadModule,
+        HttpClientModule,
+        InputTextModule,
+        FormsModule,
+        TabViewModule,
+        ListboxModule,
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })
