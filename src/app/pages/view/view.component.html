@@ -1,25 +1,58 @@
-<p>view works!</p>
-<div class="p-d-flex">
+<h1 class="center">新冠疫情数据可视化</h1>
+<div class="p-d-flex center" style="margin-bottom: 3rem">
+  <div class="container">
+    <h5>Continents</h5>
+    <p-listbox [options]="continents" [(ngModel)]="selectedContinents"
+               (onChange)="getLocations()"
+               [metaKeySelection]="false" [checkbox]="true"
+               [multiple]="true" optionLabel="name" [listStyle]="{'max-height':'20rem'}"
+               [style]="{'width':'15rem'}">
+      <ng-template let-continent pTemplate="item">
+        <div>{{continent | countryName: " "}}</div>
+      </ng-template>
+    </p-listbox>
+  </div>
+  <div class="container">
+    <h5>Locations</h5>
+    <p-listbox [options]="locations" [(ngModel)]="selectedLocations"
+               (onChange)="getDistributeData()"
+               [metaKeySelection]="false" [checkbox]="true"
+               [multiple]="true" optionLabel="name" [listStyle]="{'max-height':'22.8rem'}"
+               [style]="{'width':'15rem'}">
+      <ng-template let-location pTemplate="item">
+        <div class="country-item">
+          <div>{{location | countryName}}</div>
+        </div>
+      </ng-template>
+    </p-listbox>
+  </div>
+  <div class="container">
+    <h5>Date</h5>
+    <p-calendar [(ngModel)]="selectedDate"
+                (ngModelChange)="getDistributeData()"
+                [inline]="true" [readonlyInput]="true"
+                [minDate]="minDate" [maxDate]="maxDate"
+    ></p-calendar>
+  </div>
+</div>
 
-  <p-listbox [options]="countries" [(ngModel)]="selectedCountries"
-             [metaKeySelection]="false" [checkbox]="true" [filter]="true"
-             [multiple]="true" optionLabel="name" [listStyle]="{'max-height':'250px'}"
-             [style]="{'width':'15rem'}">
-    <ng-template let-country pTemplate="item">
-      <div class="country-item">
-        <div>{{country.name}}</div>
-      </div>
-    </ng-template>
-  </p-listbox>
-  <p-listbox [options]="countries" [(ngModel)]="selectedCountries"
-             [metaKeySelection]="false" [checkbox]="true" [filter]="true"
-             [multiple]="true" optionLabel="name" [listStyle]="{'max-height':'250px'}"
-             [style]="{'width':'15rem'}">
-    <ng-template let-country pTemplate="item">
-      <div class="country-item">
-        <div>{{country.name}}</div>
-      </div>
-    </ng-template>
-  </p-listbox>
-
+<div class="p-d-flex center">
+  <div class="chart">
+    <h5>过去7日新增确诊病例数</h5>
+    <p-chart #chart type="line" [data]="newCase7DayData"></p-chart>
+  </div>
+  <div class="chart">
+    <h5>过去7日新增死亡病例数</h5>
+    <p-chart type="line" [data]="deathCase7DayData"></p-chart>
+  </div>
+</div>
+<div class="p-d-flex center">
+  <div class="chart">
+    <h5>当日新增确诊病例数占比</h5>
+    <p-chart type="pie" [data]="oneDayNewCase"></p-chart>
+  </div>
+  <div class="chart">
+    <h5>当日新增死亡病例数占比</h5>
+    <p-chart type="pie" [data]="oneDayDeathCase"></p-chart>
+  </div>
 </div>

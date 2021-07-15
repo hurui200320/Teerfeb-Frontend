@@ -1,0 +1,14 @@
+.container {
+  margin-right: 5rem;
+}
+.center {
+  margin: auto;
+  width: fit-content;
+}
+
+.chart {
+  margin-right: 5rem;
+  margin-bottom: 3rem;
+  width: 40rem;
+  height: 30rem;
+}

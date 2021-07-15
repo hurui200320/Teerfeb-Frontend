@@ -1,14 +1,15 @@
-import {Component, OnInit} from '@angular/core';
-import {SelectItemGroup} from "primeng/api";
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {environment} from "../../../environments/environment";
+import {CountryNamePipe} from "../../pipes/country-name.pipe";
+import {UIChart} from "primeng/chart";
 
-interface City {
-  name: string,
-  code: string
-}
-
-interface Country {
-  name: string,
-  code: string
+interface Record {
+  continent: string,
+  location: string,
+  date: number[], // year, month, dayOfMonth
+  newCaseCountPerDay: number,
+  deathCountPerDay: number,
 }
 
 @Component({
@@ -17,67 +18,166 @@ interface Country {
   styleUrls: ['./view.component.css']
 })
 export class ViewComponent implements OnInit {
-  groupedCities: SelectItemGroup[];
+  private apiUrl = `${environment.backendUrl}/covid`
 
-  cities: City[];
+  continents: string[] = [];
+  selectedContinents: string[] = [];
 
-  countries: Country[];
+  locations: string[] = [];
+  selectedLocations: string[] = [];
 
-  selectedCountries: Country[] | undefined;
+  selectedDate: Date = new Date();
+  minDate: Date = new Date();
+  maxDate: Date = new Date();
 
-  constructor() {
-    this.cities = [
-      {name: 'New York', code: 'NY'},
-      {name: 'Rome', code: 'RM'},
-      {name: 'London', code: 'LDN'},
-      {name: 'Istanbul', code: 'IST'},
-      {name: 'Paris', code: 'PRS'}
-    ];
+  // @ts-ignore
+  @ViewChild('chart') chart: UIChart;
 
-    this.countries = [
-      {name: 'Australia', code: 'AU'},
-      {name: 'Brazil', code: 'BR'},
-      {name: 'China', code: 'CN'},
-      {name: 'Egypt', code: 'EG'},
-      {name: 'France', code: 'FR'},
-      {name: 'Germany', code: 'DE'},
-      {name: 'India', code: 'IN'},
-      {name: 'Japan', code: 'JP'},
-      {name: 'Spain', code: 'ES'},
-      {name: 'United States', code: 'US'}
-    ];
-    this.groupedCities = [
-      {
-        label: 'Germany', value: 'de',
-        items: [
-          {label: 'Berlin', value: 'Berlin'},
-          {label: 'Frankfurt', value: 'Frankfurt'},
-          {label: 'Hamburg', value: 'Hamburg'},
-          {label: 'Munich', value: 'Munich'}
-        ]
-      },
-      {
-        label: 'USA', value: 'us',
-        items: [
-          {label: 'Chicago', value: 'Chicago'},
-          {label: 'Los Angeles', value: 'Los Angeles'},
-          {label: 'New York', value: 'New York'},
-          {label: 'San Francisco', value: 'San Francisco'}
-        ]
-      },
-      {
-        label: 'Japan', value: 'jp',
-        items: [
-          {label: 'Kyoto', value: 'Kyoto'},
-          {label: 'Osaka', value: 'Osaka'},
-          {label: 'Tokyo', value: 'Tokyo'},
-          {label: 'Yokohama', value: 'Yokohama'}
-        ]
-      }
-    ];
+  newCase7DayData: any;
+  deathCase7DayData: any;
+
+  oneDayNewCase: any;
+  oneDayDeathCase: any;
+
+  counter = new Int8Array(1);
+
+  constructor(
+    private httpClient: HttpClient
+  ) {
+    this.counter[0] = 0;
+
   }
 
   ngOnInit(): void {
+    this.getContinents();
+    this.getDataRange();
+    this.getLocations();
   }
 
+  private generateRandomColor(): string {
+    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    return `#${randomColor}`;
+  }
+
+  private getContinents(): void {
+    this.httpClient.get(`${this.apiUrl}/continent`)
+      .subscribe((r) => {
+        this.continents = r as string[];
+      });
+  }
+
+  private getDataRange(): void {
+    this.httpClient.get(`${this.apiUrl}/date`)
+      .subscribe((r) => {
+        let result = r as { max: number[], min: number[] };
+        this.maxDate = new Date(result.max[0], result.max[1] - 1, result.max[2]);
+        this.minDate = new Date(result.min[0], result.min[1] - 1, result.min[2]);
+        this.selectedDate = this.maxDate;
+        this.getDistributeData();
+      });
+  }
+
+// update locations based on selected continents
+  getLocations() {
+    let p = {};
+    if (this.selectedContinents.length != 0) {
+      p = {continent: this.selectedContinents.join(",")}
+    }
+    this.httpClient.get(
+      `${this.apiUrl}/locations`,
+      {
+        params: p
+      }
+    ).subscribe((r) => {
+      this.locations = r as string[];
+      this.selectedLocations = [];
+      this.getDistributeData();
+    });
+  }
+
+// fetch new data
+  getDistributeData() {
+    let p = new HttpParams();
+    if (this.selectedLocations.length == 0) {
+      return;
+    }
+    p = p.append("location", this.selectedLocations.join(","));
+
+    let newCase7dayData: any = {labels: ['1', '2', '3', '4', '5', '6', '7'], datasets: []};
+    let deathCase7dayData: any = {labels: ['1', '2', '3', '4', '5', '6', '7'], datasets: []};
+    let oneDayNewCase: any = {labels: [], datasets: [{data: [], backgroundColor: [], hoverBackgroundColor: []}]};
+    let oneDayDeathCase: any = {labels: [], datasets: [{data: [], backgroundColor: [], hoverBackgroundColor: []}]};
+
+    const pipe = new CountryNamePipe();
+    this.selectedLocations.forEach((l) => {
+      newCase7dayData.datasets.push(
+        {
+          label: pipe.transform(l),
+          data: [0, 0, 0, 0, 0, 0, 0],
+          fill: false,
+          borderColor: this.generateRandomColor()
+        }
+      );
+      deathCase7dayData.datasets.push(
+        {
+          label: pipe.transform(l),
+          data: [0, 0, 0, 0, 0, 0, 0],
+          fill: false,
+          borderColor: this.generateRandomColor()
+        }
+      );
+      oneDayNewCase.labels.push(pipe.transform(l));
+      oneDayDeathCase.labels.push(pipe.transform(l));
+    });
+    Atomics.add(this.counter, 0, 7);
+    for (let i = 0; i < 7; i++) {
+      let date = new Date(this.selectedDate.getTime() - i * 86400000);
+      let temp = p.append("year", date.getFullYear());
+      temp = temp.append("month", date.getMonth() + 1);
+      temp = temp.append("day", date.getDate());
+
+      newCase7dayData.labels[6 - i] = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      deathCase7dayData.labels[6 - i] = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
+      this.httpClient.get(
+        `${this.apiUrl}/distribution`,
+        {
+          params: temp
+        }
+      ).subscribe((r) => {
+        Atomics.sub(this.counter, 0, 1);
+        let result = r as Record[];
+        this.selectedLocations.forEach((l, index) => {
+          const filtered = result.filter((re) => re.location.toLowerCase() == l.toLowerCase());
+          let newCasePerDay = 0;
+          let deathCasePerDay = 0;
+          if (filtered[0] != undefined) {
+            newCasePerDay = filtered[0].newCaseCountPerDay;
+            deathCasePerDay = filtered[0].deathCountPerDay;
+          }
+          const color = this.generateRandomColor();
+          newCase7dayData.datasets[index].data[6 - i] = newCasePerDay;
+          oneDayNewCase.datasets[0].data[index] = newCasePerDay;
+          oneDayNewCase.datasets[0].backgroundColor[index] = color;
+          oneDayNewCase.datasets[0].hoverBackgroundColor[index] = color;
+
+          deathCase7dayData.datasets[index].data[6 - i] = deathCasePerDay;
+          oneDayDeathCase.datasets[0].data[index] = deathCasePerDay;
+          oneDayDeathCase.datasets[0].backgroundColor[index] = color;
+          oneDayDeathCase.datasets[0].hoverBackgroundColor[index] = color;
+        })
+        if (this.counter[0] == 0) {
+          this.newCase7DayData = newCase7dayData;
+          this.deathCase7DayData = deathCase7dayData;
+          this.oneDayNewCase = oneDayNewCase;
+          this.oneDayDeathCase = oneDayDeathCase;
+        }
+
+        if (i == 0) {
+          // one day
+        }
+
+      });
+    }
+  }
 }
