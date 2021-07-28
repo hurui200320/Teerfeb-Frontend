@@ -130,6 +130,9 @@ export class ViewComponent implements OnInit {
       oneDayDeathCase.labels.push(pipe.transform(l));
     });
     Atomics.add(this.counter, 0, 7);
+
+    const colors = this.selectedLocations.map((s) => this.generateRandomColor());
+
     for (let i = 0; i < 7; i++) {
       let date = new Date(this.selectedDate.getTime() - i * 86400000);
       let temp = p.append("year", date.getFullYear());
@@ -155,28 +158,31 @@ export class ViewComponent implements OnInit {
             newCasePerDay = filtered[0].newCaseCountPerDay;
             deathCasePerDay = filtered[0].deathCountPerDay;
           }
-          const color = this.generateRandomColor();
-          newCase7dayData.datasets[index].data[6 - i] = newCasePerDay;
-          oneDayNewCase.datasets[0].data[index] = newCasePerDay;
-          oneDayNewCase.datasets[0].backgroundColor[index] = color;
-          oneDayNewCase.datasets[0].hoverBackgroundColor[index] = color;
 
+          newCase7dayData.datasets[index].data[6 - i] = newCasePerDay;
+          newCase7dayData.datasets[index].borderColor = colors[index];
           deathCase7dayData.datasets[index].data[6 - i] = deathCasePerDay;
-          oneDayDeathCase.datasets[0].data[index] = deathCasePerDay;
-          oneDayDeathCase.datasets[0].backgroundColor[index] = color;
-          oneDayDeathCase.datasets[0].hoverBackgroundColor[index] = color;
+          deathCase7dayData.datasets[index].borderColor = colors[index];
+          // only for one day
+          if (i == 0) {
+            oneDayNewCase.datasets[0].data[index] = newCasePerDay;
+            oneDayNewCase.datasets[0].backgroundColor[index] = colors[index];
+            oneDayNewCase.datasets[0].hoverBackgroundColor[index] = colors[index];
+            oneDayDeathCase.datasets[0].data[index] = deathCasePerDay;
+            oneDayDeathCase.datasets[0].backgroundColor[index] = colors[index];
+            oneDayDeathCase.datasets[0].hoverBackgroundColor[index] = colors[index];
+          }
         })
         if (this.counter[0] == 0) {
           this.newCase7DayData = newCase7dayData;
           this.deathCase7DayData = deathCase7dayData;
-          this.oneDayNewCase = oneDayNewCase;
-          this.oneDayDeathCase = oneDayDeathCase;
         }
 
         if (i == 0) {
           // one day
+          this.oneDayNewCase = oneDayNewCase;
+          this.oneDayDeathCase = oneDayDeathCase;
         }
-
       });
     }
   }
