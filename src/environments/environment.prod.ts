@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  backendUrl: 'https://final-report.bomnbg54fpc.jp-osa.codeengine.appdomain.cloud/api'
+  backendUrl: 'http://3.142.35.31:8080/api'
 };
